@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+    container_name: rag-api-prod
+    env_file:
+      - .env
+    environment:
+      - HF_HOME=/root/.cache/huggingface
+      - API_KEYS=${API_KEYS:-change-me-api-key}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
+      - APP_ENV=production
+    volumes:
+      - huggingface-cache:/root/.cache/huggingface
+      - ./data:/app/data
+    ports:
+      - "8000:8000"
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready').read()"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  frontend:
+    image: node:20-alpine
+    working_dir: /app/frontend
+    volumes:
+      - .:/app
+    environment:
+      - VITE_API_URL=http://api:8000
+    command: sh -lc "npm install && npm run build && npm run preview -- --host 0.0.0.0 --port 3000"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  huggingface-cache:

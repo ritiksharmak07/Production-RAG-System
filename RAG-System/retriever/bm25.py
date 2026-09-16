@@ -38,12 +38,11 @@ class BM25Retriever:
         for idx, score in ranked[:top_k]:
 
             results.append(
-
                 SearchResult(
                     score=float(score),
-                    chunk=self.chunks[idx]
+                    chunk=self.chunks[idx],
+                    document_id=idx,
                 )
-
             )
 
         return results

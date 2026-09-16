@@ -79,8 +79,15 @@ cd RAG-System/frontend
 npm run dev
 ```
 
+## Environment and secrets
+
+- Store API credentials in a runtime secret manager or your deployment environment, not in committed files.
+- Copy `.env.example` to `.env` for local development only, and replace the placeholder values before starting the app.
+- Production deployments should inject `GEMINI_API_KEY`, `API_KEYS`, and `CORS_ALLOWED_ORIGINS` via a secret manager or orchestrator environment variables.
+
 ## Notes
 
 - Uploads are validated and ingested through the backend upload endpoint.
 - The frontend proxies `/api` to the backend when running locally.
 - The project includes search, chat, and upload experiences.
+- Health and deployment checks are available at `/health`, `/health/live`, `/health/ready`, and `/metrics`.
